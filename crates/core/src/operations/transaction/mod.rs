@@ -844,6 +844,18 @@ impl PostCommit {
                 Some(self.version),
             )
             .await?;
+
+            // Run arbitrary after_post_commit_hook code
+            if let Some(custom_execute_handler) = &self.custom_execute_handler {
+                custom_execute_handler
+                    .after_post_commit_hook(
+                        &self.log_store,
+                        true,
+                        Uuid::new_v4(),
+                    )
+                    .await?
+            }
+
             Ok((
                 state,
                 PostCommitMetrics {
